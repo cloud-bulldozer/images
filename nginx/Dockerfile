@@ -1,5 +1,5 @@
 ### Setup user for build execution and application runtime
-FROM registry.access.redhat.com/ubi8/ubi-minimal
+FROM registry.access.redhat.com/ubi9/ubi-minimal
 COPY root ./
 
 RUN microdnf -y --setopt=tsflags=nodocs install nginx && \
