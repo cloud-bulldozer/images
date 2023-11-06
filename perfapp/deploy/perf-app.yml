@@ -1,0 +1,150 @@
+kind: Template
+apiVersion: template.openshift.io/v1
+labels:
+  template: perf-app
+metadata:
+  name: perf-app
+objects:
+- kind: Deployment
+  apiVersion: apps/v1
+  metadata:
+    name: postgres-${IDENTIFIER}
+  spec:
+    template:
+      metadata:
+        labels:
+          name: postgres-${IDENTIFIER}
+      spec:
+        containers:
+        - name: postgresql
+          image: registry.redhat.io/rhscl/postgresql-10-rhel7:latest
+          ports:
+          - containerPort: 5432
+            protocol: TCP
+          env:
+          - name: POSTGRESQL_USER
+            value: ${POSTGRESQL_USER}
+          - name: POSTGRESQL_PASSWORD
+            value: ${POSTGRESQL_PASSWORD}
+          - name: POSTGRESQL_DATABASE
+            value: ${POSTGRESQL_DATABASE}
+          resources: {}
+          imagePullPolicy: Always
+          capabilities: {}
+          securityContext:
+            capabilities: {}
+            privileged: false
+        restartPolicy: Always
+        serviceAccount: ''
+    replicas: 1
+    selector:
+      matchLabels:
+        name: postgres-${IDENTIFIER}
+    triggers:
+    - type: ConfigChange
+    strategy:
+      type: RollingUpdate
+- kind: Deployment
+  apiVersion: apps/v1
+  metadata:
+    name: perfapp-${IDENTIFIER}
+  spec:
+    template:
+      metadata:
+        labels:
+          name: perfapp-${IDENTIFIER}
+      spec:
+        containers:
+        - name: perfapp
+          image: quay.io/cloud-bulldozer/perfapp:latest
+          readinessProbe:
+            httpGet:
+              path: ${LIVENESS_ENDPOINT}
+              port: 8080
+            periodSeconds: 30
+            failureThreshold: 1
+            timeoutSeconds: 60
+            initialDelaySeconds: 30
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          env:
+          - name: POSTGRESQL_USER
+            value: ${POSTGRESQL_USER}
+          - name: POSTGRESQL_PASSWORD
+            value: ${POSTGRESQL_PASSWORD}
+          - name: POSTGRESQL_DATABASE
+            value: ${POSTGRESQL_DATABASE}
+          - name: POSTGRESQL_HOSTNAME
+            value: postgresql-${IDENTIFIER}
+          - name: POSTGRESQL_PORT
+            value: '5432'
+          - name: POSTGRESQL_RETRY_INTERVAL
+            value: ${POSTGRESQL_RETRY_INTERVAL}
+          resources: {}
+          imagePullPolicy: Always
+          capabilities: {}
+          securityContext:
+            capabilities: {}
+            privileged: false
+        restartPolicy: Always
+        serviceAccount: ''
+    replicas: 1
+    selector:
+      matchLabels:
+        name: perfapp-${IDENTIFIER}
+    triggers:
+    - type: ConfigChange
+    strategy:
+      type: RollingUpdate
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: postgresql-${IDENTIFIER}
+  spec:
+    selector:
+      name: postgres-${IDENTIFIER}
+    ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+    portalIP: ''
+    type: ClusterIP
+    sessionAffinity: None
+  status:
+    loadBalancer: {}
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: perfapp-${IDENTIFIER}
+  spec:
+    selector:
+      name: perfapp-${IDENTIFIER}
+    ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+    portalIP: ''
+    type: ClusterIP
+    sessionAffinity: None
+  status:
+    loadBalancer: {}
+parameters:
+- name: IDENTIFIER
+  description: Number to append to the name of resources
+  value: '1'
+- name: POSTGRESQL_USER
+  description: Postgresql database username
+  value: 'admin'
+- name: POSTGRESQL_PASSWORD
+  description: Postgresql database password
+  value: 'secret'
+- name: POSTGRESQL_DATABASE
+  description: Postgresql database name
+  value: 'mydb'
+- name: POSTGRESQL_RETRY_INTERVAL
+  description: Postgresql connection retry interval
+  value: '5'
+- name: LIVENESS_ENDPOINT
+  description: Liveness probe endpoint
+  value: '/ready'
