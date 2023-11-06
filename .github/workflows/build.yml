@@ -2,7 +2,7 @@ name: cloud-bulldozer
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
 

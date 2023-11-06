@@ -1,5 +1,9 @@
 # Container images
+
+[![cloud-bulldozer](https://github.com/cloud-bulldozer/images/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/cloud-bulldozer/images/actions/workflows/build.yml)
+
 Container Images for OCP Perf&Scale
 
-- nginx: https://quay.io/cloud-bulldozer/nginx:latest
-- etcd-perf: https://quay.io/cloud-bulldozer/etcd-perf:latest
+- nginx: quay.io/cloud-bulldozer/nginx:latest
+- etcd-perf: quay.io/cloud-bulldozer/etcd-perf:latest
+- perfApp: quay.io/cloud-bulldozer/perfapp:latest
