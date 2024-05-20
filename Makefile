@@ -3,7 +3,7 @@ ENGINE ?= podman
 ORG ?= cloud-bulldozer
 REGISTRY ?= quay.io
 REG = $(REGISTRY)/$(ORG)
-REPOS = perfapp  etcd-perf nginx
+REPOS = perfapp  etcd-perf nginx frr
 
 all: build push
 
