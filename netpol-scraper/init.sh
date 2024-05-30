@@ -2,5 +2,5 @@
 
 set -ex
 
-python3 -m http.server &
-python pod-scraper.py
+python3.11 -m http.server &
+python3.11 pod-scraper.py
