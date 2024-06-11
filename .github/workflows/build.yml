@@ -13,7 +13,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Install dependencies
-      run: sudo apt-get install qemu-user-static podman fuse-overlayfs podman
+      run: sudo apt-get update || true && sudo apt-get install -y qemu-user-static podman fuse-overlayfs
 
     - name: Login in quay
       run: podman login quay.io -u ${QUAY_USER} -p ${QUAY_TOKEN}
