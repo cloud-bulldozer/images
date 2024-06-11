@@ -1,8 +1,7 @@
 FROM registry.access.redhat.com/ubi8/ubi:latest as builder
-ARG TARGETARCH
 RUN dnf clean all && dnf install -y golang
 COPY . /perfApp
-RUN cd perfApp && GOARCH=${TARGETARCH} CGO_ENABLED=0 go build -o perfApp cmd/perfApp/perfApp.go
+RUN cd perfApp && CGO_ENABLED=0 go build -o perfApp cmd/perfApp/perfApp.go
 
 FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
 MAINTAINER Raúl Sevilla

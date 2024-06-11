@@ -8,3 +8,7 @@ Container Images for OCP Perf&Scale
 - etcd-perf: quay.io/cloud-bulldozer/etcd-perf:latest
 - perfApp: quay.io/cloud-bulldozer/perfapp:latest
 - sampleapp: quay.io/cloud-bulldozer/sampleapp:latest
+- frr: quay.io/cloud-bulldozer/frr:latest
+- netpol-scraper: quay.io/cloud-bulldozer/netpol-scraper:latest
+- eipvalidator: quay.io/cloud-bulldozer/eipvalidator:latest
+- nginxecho: quay.io/cloud-bulldozer/nginxecho:latest
