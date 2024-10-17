@@ -3,7 +3,7 @@ ENGINE ?= podman
 ORG ?= cloud-bulldozer
 REGISTRY ?= quay.io
 REG = $(REGISTRY)/$(ORG)
-REPOS = perfapp  etcd-perf nginx frr netpol-scraper nginxecho eipvalidator sampleapp netpolvalidator netpolproxy
+REPOS = perfapp  etcd-perf nginx frr netpol-scraper nginxecho eipvalidator sampleapp netpolvalidator netpolproxy convergencetracker
 
 all: build push
 
