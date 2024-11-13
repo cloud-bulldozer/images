@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -28,7 +30,7 @@ type connTest struct {
 	Timestamp  time.Time `json:"timestamp"`
 }
 
-const parallelConnections = 20
+var parallelConnections = 10
 
 var (
 	resultsLock    sync.Mutex
@@ -259,7 +261,19 @@ func sendRequests() {
 	wg.Wait()
 }
 
+func processEnvVars() {
+	var err error
+	parallelConnectionsStr := os.Getenv("PARALLEL_CONNECTIONS")
+	if parallelConnectionsStr != "" {
+		parallelConnections, err = strconv.Atoi(parallelConnectionsStr)
+		if err != nil {
+			panic(fmt.Sprintf("failed to parse env PARALLEL_CONNECTIONS: %v", err))
+		}
+	}
+}
+
 func main() {
+	processEnvVars()
 	go sendRequests()
 	http.HandleFunc("/check", handleRequest)
 	http.HandleFunc("/results", resultsHandler)
