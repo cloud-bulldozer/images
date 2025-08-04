@@ -1,0 +1,6 @@
+from quay.io/centos/centos:stream9
+
+RUN dnf -y install \
+    https://yum.theforeman.org/releases/latest/el9/x86_64/foreman-release.rpm
+
+RUN dnf -y install foreman-cli
