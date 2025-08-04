@@ -15,3 +15,4 @@ Container Images for OCP Perf&Scale
 - netpolvalidator: quay.io/cloud-bulldozer/netpolvalidator:latest
 - netpolproxy: quay.io/cloud-bulldozer/netpolproxy:latest
 - convergencetracker: quay.io/cloud-bulldozer/convergencetracker:latest
+- foreman-cli: quay.io/cloud-bulldozer/foreman-cli:latest
