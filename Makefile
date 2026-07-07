@@ -3,14 +3,14 @@ ENGINE ?= podman
 ORG ?= cloud-bulldozer
 REGISTRY ?= quay.io
 REG = $(REGISTRY)/$(ORG)
-REPOS = perfapp  etcd-perf nginx frr netpol-scraper nginxecho eipvalidator sampleapp netpolvalidator netpolproxy convergencetracker foreman-cli
+REPOS = $(shell find . -maxdepth 2 -type f \( -name Dockerfile -o -name Containerfile \) -exec dirname {} \; | sed 's|^\./||' | sort -u)
 
 all: build push
 
 build:
 	@for repo in $(REPOS); do \
 	  echo -e "\033[2mBuilding $$repo\033[0m"; \
-	  if [ "$$repo" = "foreman-cli" ]; then \
+	  if [ "$$repo" = "foreman-cli" ] || [ "$$repo" = "prow" ]; then \
 	    $(ENGINE) build --jobs=4 --platform=linux/amd64 --manifest=$(REG)/$$repo:latest $$repo; \
 	  else \
 	    $(ENGINE) build --jobs=4 --platform=$(PLATFORMS) --manifest=$(REG)/$$repo:latest $$repo; \

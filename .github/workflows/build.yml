@@ -17,6 +17,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Install dependencies
       run: sudo apt-get update || true && sudo apt-get install -y qemu-user-static podman fuse-overlayfs
@@ -28,9 +30,21 @@ jobs:
         QUAY_USER: ${{ secrets.QUAY_USER }}
         QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
 
-    - name: Build containers only (PR)
+    - name: Detect changed images
       if: github.event_name == 'pull_request'
-      run: make build
+      id: changed
+      run: |
+        CHANGED_REPOS=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | xargs -I{} dirname {} | sort -u | while read dir; do
+          if [ -f "$dir/Dockerfile" ] || [ -f "$dir/Containerfile" ]; then
+            echo "$dir"
+          fi
+        done | tr '\n' ' ')
+        echo "repos=${CHANGED_REPOS}" >> "$GITHUB_OUTPUT"
+        echo "Changed image directories: ${CHANGED_REPOS:-none}"
+
+    - name: Build containers only (PR)
+      if: github.event_name == 'pull_request' && steps.changed.outputs.repos != ''
+      run: make build REPOS="${{ steps.changed.outputs.repos }}"
 
     - name: Build and push containers (main branch)
       if: github.event_name == 'push'
