@@ -10,7 +10,7 @@ all: build push
 build:
 	@for repo in $(REPOS); do \
 	  echo -e "\033[2mBuilding $$repo\033[0m"; \
-	  if [ "$$repo" = "foreman-cli" ]; then \
+	  if [ "$$repo" = "foreman-cli" ] || [ "$$repo" = "prow" ]; then \
 	    $(ENGINE) build --jobs=4 --platform=linux/amd64 --manifest=$(REG)/$$repo:latest $$repo; \
 	  else \
 	    $(ENGINE) build --jobs=4 --platform=$(PLATFORMS) --manifest=$(REG)/$$repo:latest $$repo; \
