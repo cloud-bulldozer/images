@@ -3,7 +3,7 @@ ENGINE ?= podman
 ORG ?= cloud-bulldozer
 REGISTRY ?= quay.io
 REG = $(REGISTRY)/$(ORG)
-REPOS = perfapp  etcd-perf nginx frr netpol-scraper nginxecho eipvalidator sampleapp netpolvalidator netpolproxy convergencetracker foreman-cli
+REPOS = $(shell find . -maxdepth 2 -type f \( -name Dockerfile -o -name Containerfile \) -exec dirname {} \; | sed 's|^\./||' | sort -u)
 
 all: build push
 
