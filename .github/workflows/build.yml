@@ -14,6 +14,23 @@ jobs:
 
   build-containers:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        repo:
+        - perfapp
+        - etcd-perf
+        - nginx
+        - nginx-ssh
+        - frr
+        - netpol-scraper
+        - nginxecho
+        - eipvalidator
+        - sampleapp
+        - netpolvalidator
+        - netpolproxy
+        - convergencetracker
+        - foreman-cli
 
     steps:
     - uses: actions/checkout@v4
@@ -28,10 +45,30 @@ jobs:
         QUAY_USER: ${{ secrets.QUAY_USER }}
         QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
 
-    - name: Build containers only (PR)
-      if: github.event_name == 'pull_request'
-      run: make build
+    - name: Set platforms
+      id: platforms
+      run: |
+        if [ "${{ matrix.repo }}" = "foreman-cli" ]; then
+          echo "platforms=linux/amd64" >> $GITHUB_OUTPUT
+        else
+          echo "platforms=linux/amd64,linux/ppc64le,linux/arm64,linux/s390x" >> $GITHUB_OUTPUT
+        fi
 
-    - name: Build and push containers (main branch)
+    - name: Build (PR)
+      if: github.event_name == 'pull_request'
+      run: |
+        podman build --jobs=4 \
+          --platform=${{ steps.platforms.outputs.platforms }} \
+          --manifest=quay.io/cloud-bulldozer/${{ matrix.repo }}:latest \
+          ${{ matrix.repo }}
+
+    - name: Build and push (main branch)
       if: github.event_name == 'push'
-      run: make 
+      run: |
+        podman build --jobs=4 \
+          --platform=${{ steps.platforms.outputs.platforms }} \
+          --manifest=quay.io/cloud-bulldozer/${{ matrix.repo }}:latest \
+          ${{ matrix.repo }}
+        podman manifest push \
+          quay.io/cloud-bulldozer/${{ matrix.repo }}:latest \
+          quay.io/cloud-bulldozer/${{ matrix.repo }}:latest
